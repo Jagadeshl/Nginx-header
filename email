@@ -1,0 +1,14 @@
+We have reviewed the OS-level memory statistics on the DB node (EOTSSITDBNODE1) as requested. Below is the detailed breakdown:
+​OS Memory Breakdown (Total: 15.4 GB RAM / 16 GB Swap):
+​Active OS/PGA Used: 4.75 GB (~30.1%)
+​Shared Memory (Oracle SGA): 5.34 GB (~33.8%)
+​Buff/Cache: 9.8 GB (includes the 5.34 GB shared SGA + OS page cache)
+​Available Memory: 5.26 GB (~33.4%)
+​Free (Idle): ~1.0 GB (~6.3%)
+​Swap Used: 1.55 GB (~9.5%)
+​Root Cause Analysis:
+​False Monitoring Alert: Standard infrastructure monitoring tools flag high memory utilization by computing (Total - Free) / Total (~93.7%), which treats the OS buff/cache and shared memory as consumed/unavailable. However, actual Available Memory remains healthy at ~5.26 GB (33.4%).
+​HugePages Disabled: /proc/meminfo confirms HugePages_Total: 0. Oracle SGA is currently managed via standard 4KB shared memory (tmpfs), which contributes directly to shared/buff/cache accounting and minor swap utilization.
+​Non-Oracle Agents: OS-level background agents (Trend Micro ds_agent at ~615 MB, TFA Java at ~247 MB, Splunk at ~230 MB, and Grid Infrastructure daemons) account for ~1.5 GB of private resident memory.
+​Conclusion & Recommendation:
+The DB node has sufficient available headroom, and the alert was triggered by how the monitoring tool accounts for shared memory and buffer cache. To eliminate swap usage and optimize memory tracking, we recommend scheduling the configuration of Linux HugePages for the Oracle 19c SGA.
