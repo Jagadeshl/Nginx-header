@@ -1,0 +1,8 @@
+With reference to the DBA team's observation and our review of the OS-level memory statistics during and after the test execution window, please find the findings below:
+​Key Findings:
+​Buffer/Cache Allocation: Out of the total 15.76 GB physical memory, the actual application active used memory is only ~4.7 GB (30%). The remaining ~10.05 GB (64%) is held in Linux buff/cache (Page Cache) and shared memory.
+​Healthy Available Memory: The system maintains ~5.3 GB (33.7%) in MemAvailable. Linux automatically reclaims page cache memory immediately when needed by Oracle or any running process.
+​No Database Memory Pressure: Swap activity is negligible (si/so = 0 in vmstat), CPU wait I/O is low (< 1%), and Oracle SGA/PGA utilization remains normal and stable.
+​Monitoring Tool Overhead: The infrastructure monitoring alert is triggered because the tool calculates utilization as (Total - Free) / Total without factoring in reclaimable buff/cache.
+​Conclusion:
+There is no actual memory bottleneck or exhaustion on the database nodes. The server memory health is normal.
